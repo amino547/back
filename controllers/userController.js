@@ -159,6 +159,44 @@ module.exports = { register, login, getUserProfile, updateUserProfile };*/
 
 
 
+const User = require('../models/userModel');
+
+const getUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).select('-password');
+    res.json(user);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+};
+
+const updateUser = async (req, res) => {
+  const { name, email } = req.body;
+  const userFields = {};
+  if (name) userFields.name = name;
+  if (email) userFields.email = email;
+  try {
+    let user = await User.findById(req.params.id);
+    if (user) {
+      user = await User.findByIdAndUpdate(
+        req.params.id,
+        { $set: userFields },
+        { new: true }
+      ).select('-password');
+      return res.json(user);
+    }
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server error');
+  }
+};
+
+module.exports = { getUser, updateUser };
+
+
+
+
 
 
 
